@@ -1,4 +1,4 @@
-package com.tk.EventManager;
+package com.tk.eventmanager;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
