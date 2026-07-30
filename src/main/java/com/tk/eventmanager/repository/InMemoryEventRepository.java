@@ -1,16 +1,30 @@
 package com.tk.eventmanager.repository;
 
 import com.tk.eventmanager.model.Event;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Profile("dev")
 @Repository
-public class InMemoryEventRepository {
+public class InMemoryEventRepository implements EventRepository {
 
-    private final Map<Long, Event> storage = new HashMap<>();
+    private final ConcurrentHashMap<Long, Event> storage = new ConcurrentHashMap<>();
     private final AtomicLong counter = new AtomicLong(1);
+
+    @PostConstruct
+    public void init(){
+        System.out.println("PostConstruct - InMemoryEventRepository");
+    }
+    @PreDestroy
+    public void destroy(){
+        System.out.println("PostConstruct - InMemoryEventRepository");
+    }
 
     public Event save(Event event) {
         if (event.getId() == null) {
@@ -27,5 +41,10 @@ public class InMemoryEventRepository {
 
     public List<Event> findAll() {
         return new ArrayList<>(storage.values());
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        storage.remove(id);
     }
 }

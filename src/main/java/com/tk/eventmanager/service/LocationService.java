@@ -2,6 +2,7 @@ package com.tk.eventmanager.service;
 
 import com.tk.eventmanager.model.Location;
 import com.tk.eventmanager.repository.InMemoryLocationRepository;
+import com.tk.eventmanager.repository.LocationRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,9 +11,9 @@ import java.util.Optional;
 @Service
 public class LocationService {
 
-    private final InMemoryLocationRepository repository;
+    private final LocationRepository repository;
 
-    public LocationService(InMemoryLocationRepository repository) {
+    public LocationService(LocationRepository repository) {
         this.repository = repository;
         System.out.println("[SERVICE] Мне внедрили репозиторий: " + repository);
     }
