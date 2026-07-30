@@ -1,7 +1,9 @@
 package com.tk.eventmanager.service;
 
 import com.tk.eventmanager.model.Event;
+import com.tk.eventmanager.model.Location;
 import com.tk.eventmanager.repository.EventRepository;
+import com.tk.eventmanager.repository.LocationRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,34 +12,34 @@ import java.util.Optional;
 @Service
 public class EventService {
 
-    private final EventRepository repository;
+    private final EventRepository eventRepository;
+    private final LocationRepository locationRepository;
 
-    public EventService(EventRepository repository) {
-        this.repository = repository;
+    public EventService(EventRepository eventRepository,
+                        LocationRepository locationRepository) {
+        this.eventRepository = eventRepository;
+        this.locationRepository = locationRepository;
     }
 
-    public Event createEvent(String title, String description, int capacity) {
+    public Event createEvent(String title, String description,
+                             int capacity, Long locationId) {
         Event event = new Event();
         event.setTitle(title);
         event.setDescription(description);
         event.setCapacity(capacity);
         event.setStatus("DRAFT");
-        return repository.save(event);  // ← INSERT в БД
+
+        if (locationId != null) {
+            Location location = locationRepository.findById(locationId)
+                    .orElseThrow(() -> new RuntimeException("Location not found: " + locationId));
+            event.setLocation(location);
+        }
+
+        return eventRepository.save(event);
     }
 
-    public Optional<Event> getEvent(Long id) {
-        return repository.findById(id);  // ← SELECT по ID
-    }
-
-    public List<Event> getAllEvents() {
-        return repository.findAll();  // ← SELECT *
-    }
-
-    public void deleteEvent(Long id) {
-        repository.deleteById(id);  // ← DELETE
-    }
-
-    public List<Event> getEventsByStatus(String status) {
-        return repository.findByStatus(status);  // ← кастомный запрос
+    public Event getEventWithLocation(Long id) {
+        return eventRepository.findByIdWithLocation(id)
+                .orElseThrow(() -> new RuntimeException("Event not found: " + id));
     }
 }
