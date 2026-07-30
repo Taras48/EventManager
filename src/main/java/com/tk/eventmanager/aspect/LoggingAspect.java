@@ -11,7 +11,7 @@ import java.util.Arrays;
 @Component
 public class LoggingAspect {
 
-    @Around("execution(* com.eventmanager.service..*(..))")
+    @Around("execution(* com.tk.eventmanager.service..*(..))")
     //        │              │                    │
     //        │              │                    └─ любые аргументы
     //        │              └─ любой метод в пакете service и подпакетах

@@ -1,13 +1,10 @@
 package com.tk.eventmanager.repository;
 
 import com.tk.eventmanager.model.Location;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface LocationRepository {
-    Location save(Location event);
-    Optional<Location> findById(Long id);
-    List<Location> findAll();
-    void deleteById(Long id);
+@Repository
+public interface LocationRepository extends JpaRepository<Location, Long> {
+    // Тоже пустой. Всё работает из коробки.
 }

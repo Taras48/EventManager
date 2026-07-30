@@ -46,6 +46,21 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Source: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<version>4.1.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- НОВОЕ: Драйвер PostgreSQL -->
+		<dependency>
+		<groupId>org.postgresql</groupId>
+		<artifactId>postgresql</artifactId>
+		<scope>runtime</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
