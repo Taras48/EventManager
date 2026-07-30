@@ -2,6 +2,7 @@ package com.tk.eventmanager.repository;
 
 import com.tk.eventmanager.model.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @Query("SELECT e FROM Event e JOIN FETCH e.location WHERE e.id = :id")
     Optional<Event> findByIdWithLocation(@Param("id") Long id);
+
+    @Modifying
+    @Query("update Event e set e.id = :id1 where e.id = :id2")
+    Event update(@Param("id") Long id, @Param("id") Event event);
 }
