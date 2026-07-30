@@ -23,7 +23,7 @@ public class InMemoryEventRepository implements EventRepository {
     }
     @PreDestroy
     public void destroy(){
-        System.out.println("PostConstruct - InMemoryEventRepository");
+        System.out.println("destroy - InMemoryEventRepository");
     }
 
     public Event save(Event event) {

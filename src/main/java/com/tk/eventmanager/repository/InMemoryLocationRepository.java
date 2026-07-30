@@ -23,7 +23,7 @@ public class InMemoryLocationRepository implements LocationRepository{
     }
     @PreDestroy
     public void destroy(){
-        System.out.println("PostConstruct - InMemoryLocationRepository");
+        System.out.println("destroy - InMemoryLocationRepository");
     }
 
     public Location save(Location event) {

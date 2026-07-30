@@ -1,7 +1,6 @@
 package com.tk.eventmanager.service;
 
 import com.tk.eventmanager.model.Location;
-import com.tk.eventmanager.repository.InMemoryLocationRepository;
 import com.tk.eventmanager.repository.LocationRepository;
 import org.springframework.stereotype.Service;
 

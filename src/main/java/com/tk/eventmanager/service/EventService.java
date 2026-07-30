@@ -2,7 +2,6 @@ package com.tk.eventmanager.service;
 
 import com.tk.eventmanager.model.Event;
 import com.tk.eventmanager.repository.EventRepository;
-import com.tk.eventmanager.repository.InMemoryEventRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,20 +14,30 @@ public class EventService {
 
     public EventService(EventRepository repository) {
         this.repository = repository;
-        System.out.println("[SERVICE] Мне внедрили репозиторий: " + repository);
     }
 
-    public Event createEvent(String title) {
+    public Event createEvent(String title, String description, int capacity) {
         Event event = new Event();
         event.setTitle(title);
-        return repository.save(event);
-    }
-
-    public List<Event> getAllEvents() {
-        return repository.findAll();
+        event.setDescription(description);
+        event.setCapacity(capacity);
+        event.setStatus("DRAFT");
+        return repository.save(event);  // ← INSERT в БД
     }
 
     public Optional<Event> getEvent(Long id) {
-        return repository.findById(id);
+        return repository.findById(id);  // ← SELECT по ID
+    }
+
+    public List<Event> getAllEvents() {
+        return repository.findAll();  // ← SELECT *
+    }
+
+    public void deleteEvent(Long id) {
+        repository.deleteById(id);  // ← DELETE
+    }
+
+    public List<Event> getEventsByStatus(String status) {
+        return repository.findByStatus(status);  // ← кастомный запрос
     }
 }
