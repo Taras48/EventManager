@@ -2,6 +2,8 @@ package com.tk.eventmanager.service;
 
 import com.tk.eventmanager.model.Location;
 import com.tk.eventmanager.repository.LocationRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +28,8 @@ public class LocationService {
         return repository.save(location);
     }
     @Transactional(readOnly = true)
-    public List<Location> getAllLocations() {
-        return repository.findAll();
+    public Page<Location> getAllLocations(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)

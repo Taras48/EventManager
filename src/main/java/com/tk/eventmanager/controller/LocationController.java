@@ -6,6 +6,8 @@ import com.tk.eventmanager.mapper.LocationMapper;
 import com.tk.eventmanager.model.Location;
 import com.tk.eventmanager.service.LocationService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +28,9 @@ public class LocationController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LocationResponse>> getAllLocations() {
-        List<LocationResponse> locations = locationService.getAllLocations().stream()
-                .map(locationMapper::toResponse)
-                .collect(Collectors.toList());
+    public ResponseEntity<Page<LocationResponse>> getAllLocations(Pageable pageable) {
+        Page<LocationResponse> locations = locationService.getAllLocations(pageable)
+                .map(locationMapper::toResponse);
         return ResponseEntity.ok(locations);
     }
 

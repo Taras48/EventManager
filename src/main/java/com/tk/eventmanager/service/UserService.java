@@ -1,5 +1,6 @@
 package com.tk.eventmanager.service;
 
+import com.tk.eventmanager.exception.DuplicateException;
 import com.tk.eventmanager.model.User;
 import com.tk.eventmanager.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class UserService {
     @Transactional
     public User createUser(String name, String email) {
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Email already exists: " + email);
+            throw new DuplicateException("Email already exists: " + email);
         }
         User user = new User();
         user.setName(name);
