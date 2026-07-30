@@ -6,6 +6,8 @@ import com.tk.eventmanager.mapper.RegistrationMapper;
 import com.tk.eventmanager.model.Registration;
 import com.tk.eventmanager.service.RegistrationService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,14 +39,13 @@ public class RegistrationController {
                 .body(registrationMapper.toResponse(reg));
     }
 
-    // GET /api/registrations?eventId=5 → регистрации на событие
     @GetMapping(params = "eventId")
-    public ResponseEntity<List<RegistrationResponse>> getByEvent(
-            @RequestParam Long eventId) {
-        List<RegistrationResponse> regs = registrationService
-                .getRegistrationsForEvent(eventId).stream()
-                .map(registrationMapper::toResponse)
-                .collect(Collectors.toList());
+    public ResponseEntity<Page<RegistrationResponse>> getByEvent(
+            @RequestParam Long eventId,
+            Pageable pageable) {
+        Page<RegistrationResponse> regs = registrationService
+                .getRegistrationsForEvent(eventId, pageable)
+                .map(registrationMapper::toResponse);
         return ResponseEntity.ok(regs);
     }
 

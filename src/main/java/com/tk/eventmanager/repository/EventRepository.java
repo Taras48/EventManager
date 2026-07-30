@@ -1,6 +1,9 @@
 package com.tk.eventmanager.repository;
 
 import com.tk.eventmanager.model.Event;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -29,4 +32,9 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Modifying
     @Query("update Event e set e.id = :id1 where e.id = :id2")
     Event update(@Param("id") Long id, @Param("id") Event event);
+
+    Page<Event> findByStatus(String status, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"location"})
+    Page<Event> findAllWithLocation(Pageable pageable);
 }

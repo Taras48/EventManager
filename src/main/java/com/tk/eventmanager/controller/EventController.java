@@ -6,6 +6,8 @@ import com.tk.eventmanager.mapper.EventMapper;
 import com.tk.eventmanager.model.Event;
 import com.tk.eventmanager.service.EventService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,10 +37,11 @@ public class EventController {
     }
 
     // GET /api/events/5 → одно событие
-    @GetMapping("/{id}")
-    public ResponseEntity<EventResponse> getEvent(@PathVariable Long id) {
-        Event event = eventService.getEventWithLocation(id);
-        return ResponseEntity.ok(eventMapper.toResponse(event));
+    @GetMapping
+    public ResponseEntity<Page<EventResponse>> getAllEvents(Pageable pageable) {
+        Page<EventResponse> events = eventService.getAllEvents(pageable)
+                .map(eventMapper::toResponse);  // ← Page.map() — мапит каждый элемент
+        return ResponseEntity.ok(events);
     }
 
     // POST /api/events → создать событие
@@ -76,13 +79,13 @@ public class EventController {
         return ResponseEntity.noContent().build();  // 204 No Content
     }
 
-    // GET /api/events?status=DRAFT → фильтрация
+    // GET /api/events?status=DRAFT&page=0&size=5
     @GetMapping(params = "status")
-    public ResponseEntity<List<EventResponse>> getEventsByStatus(
-            @RequestParam String status) {
-        List<EventResponse> events = eventService.getEventsByStatus(status).stream()
-                .map(eventMapper::toResponse)
-                .collect(Collectors.toList());
+    public ResponseEntity<Page<EventResponse>> getEventsByStatus(
+            @RequestParam String status,
+            Pageable pageable) {
+        Page<EventResponse> events = eventService.getEventsByStatus(status, pageable)
+                .map(eventMapper::toResponse);
         return ResponseEntity.ok(events);
     }
 }

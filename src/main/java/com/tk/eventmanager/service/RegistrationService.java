@@ -1,11 +1,16 @@
 package com.tk.eventmanager.service;
 
+import com.tk.eventmanager.exception.BadRequestException;
+import com.tk.eventmanager.exception.DuplicateException;
+import com.tk.eventmanager.exception.ResourceNotFoundException;
 import com.tk.eventmanager.model.Event;
 import com.tk.eventmanager.model.Registration;
 import com.tk.eventmanager.model.User;
 import com.tk.eventmanager.repository.EventRepository;
 import com.tk.eventmanager.repository.RegistrationRepository;
 import com.tk.eventmanager.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,16 +34,17 @@ public class RegistrationService {
     @Transactional
     public Registration register(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
+                .orElseThrow(() -> new ResourceNotFoundException("Event", eventId));
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
         if (registrationRepository.existsByEventIdAndUserId(eventId, userId)) {
-            throw new RuntimeException("User already registered for this event");
+            throw new DuplicateException(
+                    "User " + userId + " already registered for event " + eventId);
         }
 
         if (event.getCapacity() <= 0) {
-            throw new RuntimeException("No seats available");
+            throw new BadRequestException("No seats available for event: " + eventId);
         }
 
         event.setCapacity(event.getCapacity() - 1);
@@ -51,14 +57,14 @@ public class RegistrationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Registration> getRegistrationsForEvent(Long eventId) {
-        return registrationRepository.findByEventId(eventId);
+    public Page<Registration> getRegistrationsForEvent(Long eventId, Pageable pageable) {
+        return registrationRepository.findByEventId(eventId, pageable);
     }
 
     @Transactional
     public void cancelRegistration(Long registrationId) {
         Registration reg = registrationRepository.findById(registrationId)
-                .orElseThrow(() -> new RuntimeException("Registration not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Registration", registrationId));
 
         reg.setStatus("CANCELED");
         // dirty checking → UPDATE при COMMIT
