@@ -5,6 +5,7 @@ import com.tk.eventmanager.model.Location;
 import com.tk.eventmanager.repository.EventRepository;
 import com.tk.eventmanager.repository.LocationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public class EventService {
         this.eventRepository = eventRepository;
         this.locationRepository = locationRepository;
     }
-
+    @Transactional
     public Event createEvent(String title, String description,
                              int capacity, Long locationId) {
         Event event = new Event();
@@ -37,7 +38,7 @@ public class EventService {
 
         return eventRepository.save(event);
     }
-
+    @Transactional(readOnly = true)
     public Event getEventWithLocation(Long id) {
         return eventRepository.findByIdWithLocation(id)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + id));

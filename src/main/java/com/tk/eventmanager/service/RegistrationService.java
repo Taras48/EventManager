@@ -7,6 +7,7 @@ import com.tk.eventmanager.repository.EventRepository;
 import com.tk.eventmanager.repository.RegistrationRepository;
 import com.tk.eventmanager.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class RegistrationService {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
     }
-
+    @Transactional
     public Registration register(Long eventId, Long userId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
@@ -37,7 +38,7 @@ public class RegistrationService {
 
         return registrationRepository.save(reg);
     }
-
+    @Transactional(readOnly = true)
     public List<Registration> getRegistrationsForEvent(Long eventId) {
         return registrationRepository.findByEventId(eventId);
     }
