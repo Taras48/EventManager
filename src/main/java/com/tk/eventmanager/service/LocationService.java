@@ -18,18 +18,24 @@ public class LocationService {
         System.out.println("[SERVICE] Мне внедрили репозиторий: " + repository);
     }
     @Transactional
-    public Location createLocation(String name, String address) {
+    public Location createLocation(String name, String address, Integer capacity) {
         Location location = new Location();
         location.setName(name);
         location.setAddress(address);
+        location.setCapacity(capacity);
         return repository.save(location);
     }
     @Transactional(readOnly = true)
     public List<Location> getAllLocations() {
         return repository.findAll();
     }
+
     @Transactional(readOnly = true)
     public Optional<Location> getLocation(Long id) {
         return repository.findById(id);
+    }
+
+    public void deleteLocation(Long id) {
+        repository.deleteById(id);
     }
 }

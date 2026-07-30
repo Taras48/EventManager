@@ -1,6 +1,8 @@
 package com.tk.eventmanager.model;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity                          // ← "Hibernate, я таблица!"
@@ -28,6 +30,9 @@ public class Event {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "price")
+    private BigDecimal price;
 
     // === СВЯЗЬ: много событий → одна локация ===
     @ManyToOne(fetch = FetchType.LAZY)   // ← тип связи
@@ -76,8 +81,17 @@ public class Event {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
 
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
     @Override
     public String toString() {
         return "Event{id=" + id + ", title='" + title + "', status='" + status + "'}";
     }
+
 }
