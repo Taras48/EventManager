@@ -3,6 +3,7 @@ package com.tk.eventmanager.repository;
 import com.tk.eventmanager.model.Event;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -34,6 +35,6 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Page<Event> findByStatus(String status, Pageable pageable);
 
-    @Query("SELECT e FROM Event e LEFT JOIN FETCH e.location")
+    @EntityGraph(attributePaths = {"location"})
     Page<Event> findAllWithLocation(Pageable pageable);
 }

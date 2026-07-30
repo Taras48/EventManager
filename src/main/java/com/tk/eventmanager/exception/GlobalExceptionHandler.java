@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
                 "Internal Server Error",
                 "Something went wrong"  // ← НЕ показываем детали клиенту!
         );
-        log.error("Internal Server Error\"", ex);
+        log.error("Unhandled exception", ex);
         // В лог — полный стектрейс
         // log.error("Unhandled exception", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
