@@ -2,6 +2,8 @@ package com.tk.eventmanager.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "locations")
@@ -22,12 +24,34 @@ public class Location {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    // === СВЯЗЬ: одна локация → много событий ===
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Event> events = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
     public Location() {}
+
+    public void addEvent(Event event) {
+        events.add(event);
+        event.setLocation(this);  // ← обе стороны!
+    }
+
+    public void removeEvent(Event event) {
+        events.remove(event);
+        event.setLocation(null);  // ← обе стороны!
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
 
     public Long getId() {
         return id;

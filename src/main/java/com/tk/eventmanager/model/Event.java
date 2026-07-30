@@ -29,6 +29,11 @@ public class Event {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    // === СВЯЗЬ: много событий → одна локация ===
+    @ManyToOne(fetch = FetchType.LAZY)   // ← тип связи
+    @JoinColumn(name = "location_id")     // ← колонка в таблице events
+    private Location location;
+
     // === Жизненный цикл Entity ===
     @PrePersist
     protected void onCreate() {
@@ -37,6 +42,18 @@ public class Event {
 
     // Конструкторы
     public Event() {}  // ← Hibernate ТРЕБУЕТ пустой конструктор!
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 
     // Геттеры и сеттеры
     public Long getId() { return id; }
