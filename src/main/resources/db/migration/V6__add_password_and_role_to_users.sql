@@ -1,0 +1,3 @@
+-- V6__add_password_and_role_to_users.sql
+ALTER TABLE users ADD COLUMN password VARCHAR(255) NOT NULL DEFAULT '';
+ALTER TABLE users ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'USER';
