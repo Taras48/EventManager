@@ -2,6 +2,7 @@ package com.tk.eventmanager.controller;
 
 import com.tk.eventmanager.dto.AuthResponse;
 import com.tk.eventmanager.dto.LoginRequest;
+import com.tk.eventmanager.dto.RefreshRequest;
 import com.tk.eventmanager.dto.RegisterRequest;
 import com.tk.eventmanager.service.AuthService;
 import jakarta.validation.Valid;
@@ -19,17 +20,19 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // POST /api/auth/register
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        AuthResponse response = authService.register(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
     }
 
-    // POST /api/auth/login
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(authService.login(request));
+    }
+
+    // НОВЫЙ: refresh
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
+        return ResponseEntity.ok(authService.refresh(request));
     }
 }

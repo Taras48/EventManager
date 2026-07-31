@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -17,31 +18,43 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration-ms}")
-    private long expirationMs;
+    @Value("${jwt.access-expiration-ms}")
+    private long accessExpirationMs;
 
-    // === Генерация токена ===
-    public String generateToken(String email, String role) {
+    @Value("${jwt.refresh-expiration-ms}")
+    private long refreshExpirationMs;
+
+    // === Access-токен (короткий) ===
+    public String generateAccessToken(String email, String role) {
         return Jwts.builder()
-                .subject(email)                    // "sub" — кто
-                .claim("role", role)               // кастомное поле
-                .issuedAt(new Date())              // "iat" — когда создан
-                .expiration(new Date(System.currentTimeMillis() + expirationMs))  // "exp"
-                .signWith(getSigningKey())         // подпись
+                .subject(email)
+                .claim("role", role)
+                .claim("type", "access")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + accessExpirationMs))
+                .signWith(getSigningKey())
                 .compact();
     }
 
-    // === Извлечение email из токена ===
+    // === Refresh-токен (длинный, просто UUID) ===
+    public String generateRefreshToken() {
+        return UUID.randomUUID().toString();
+    }
+
+    public long getRefreshExpirationMs() {
+        return refreshExpirationMs;
+    }
+
+    // === Извлечение ===
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // === Извлечение роли ===
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
-    // === Валидация: не истёк ли? ===
+    // === Валидация ===
     public boolean isTokenValid(String token) {
         try {
             Date expiration = extractClaim(token, Claims::getExpiration);
@@ -51,7 +64,6 @@ public class JwtService {
         }
     }
 
-    // === Извлечение любого claim ===
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
         Claims claims = Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -61,9 +73,7 @@ public class JwtService {
         return resolver.apply(claims);
     }
 
-    // === Ключ подписи ===
     private SecretKey getSigningKey() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 }
