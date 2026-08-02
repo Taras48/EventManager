@@ -3,18 +3,12 @@ package com.tk.eventmanager.service;
 import com.tk.eventmanager.exception.BadRequestException;
 import com.tk.eventmanager.exception.DuplicateException;
 import com.tk.eventmanager.exception.ResourceNotFoundException;
-import com.tk.eventmanager.model.Event;
-import com.tk.eventmanager.model.Registration;
-import com.tk.eventmanager.model.User;
-import com.tk.eventmanager.repository.EventRepository;
-import com.tk.eventmanager.repository.RegistrationRepository;
-import com.tk.eventmanager.repository.UserRepository;
+import com.tk.eventmanager.model.*;
+import com.tk.eventmanager.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class RegistrationService {
@@ -38,27 +32,32 @@ public class RegistrationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
+        // === БИЗНЕС-ПРАВИЛА ===
+
+        // 1. Регистрация открыта только на PUBLISHED события
+        if (!event.isRegistrationOpen()) {
+            throw new BadRequestException(
+                    "Registration is not open for event '" + event.getTitle() +
+                            "' (status: " + event.getStatus() + ", capacity: " + event.getCapacity() + ")");
+        }
+
+        // 2. Нельзя зарегистрироваться дважды
         if (registrationRepository.existsByEventIdAndUserId(eventId, userId)) {
             throw new DuplicateException(
-                    "User " + userId + " already registered for event " + eventId);
+                    "User " + userId + " is already registered for event " + eventId);
         }
 
-        if (event.getCapacity() <= 0) {
-            throw new BadRequestException("No seats available for event: " + eventId);
-        }
-
+        // 3. Уменьшаем количество мест
         event.setCapacity(event.getCapacity() - 1);
-        // save() не нужен — dirty checking
+        // dirty checking → UPDATE
 
+        // 4. Создаём регистрацию
         Registration reg = new Registration();
         reg.setEvent(event);
         reg.setUser(user);
-        return registrationRepository.save(reg);
-    }
+        reg.setStatus(RegistrationStatus.CONFIRMED);
 
-    @Transactional(readOnly = true)
-    public Page<Registration> getRegistrationsForEvent(Long eventId, Pageable pageable) {
-        return registrationRepository.findByEventId(eventId, pageable);
+        return registrationRepository.save(reg);
     }
 
     @Transactional
@@ -66,11 +65,26 @@ public class RegistrationService {
         Registration reg = registrationRepository.findById(registrationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Registration", registrationId));
 
-        reg.setStatus("CANCELED");
-        // dirty checking → UPDATE при COMMIT
+        if (reg.getStatus() == RegistrationStatus.CANCELED) {
+            throw new BadRequestException("Registration is already canceled");
+        }
 
-        // Возвращаем место
-        Event event = reg.getEvent();  // LAZY, но мы в транзакции → ок
-        event.setCapacity(event.getCapacity() + 1);
+        // Отменяем
+        reg.setStatus(RegistrationStatus.CANCELED);
+
+        // Возвращаем место (только если событие ещё актуально)
+        Event event = reg.getEvent();
+        if (event.getStatus() == EventStatus.PUBLISHED) {
+            event.setCapacity(event.getCapacity() + 1);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Registration> getRegistrationsForEvent(Long eventId, Pageable pageable) {
+        // Проверяем, что событие существует
+        if (!eventRepository.existsById(eventId)) {
+            throw new ResourceNotFoundException("Event", eventId);
+        }
+        return registrationRepository.findByEventId(eventId, pageable);
     }
 }

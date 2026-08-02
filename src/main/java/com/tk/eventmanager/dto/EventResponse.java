@@ -1,5 +1,7 @@
 package com.tk.eventmanager.dto;
 
+import com.tk.eventmanager.model.EventStatus;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -9,13 +11,15 @@ public class EventResponse {
     private String title;
     private String description;
     private int capacity;
-    private String status;
+    private String status;        // ← теперь из enum
     private BigDecimal price;
     private LocalDateTime eventDate;
     private LocalDateTime createdAt;
-    private String locationName;   // ← не объект Location, а просто имя!
+    private LocalDateTime publishedAt;   // ← НОВОЕ
+    private LocalDateTime canceledAt;    // ← НОВОЕ
+    private String locationName;
     private Long locationId;
-
+    private boolean registrationOpen;    // ← НОВОЕ: удобно для фронтенда
     // Геттеры и сеттеры
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -46,4 +50,13 @@ public class EventResponse {
 
     public Long getLocationId() { return locationId; }
     public void setLocationId(Long locationId) { this.locationId = locationId; }
+
+    public void setPublishedAt(LocalDateTime publishedAt) {
+    }
+
+    public void setCanceledAt(LocalDateTime canceledAt) {
+    }
+
+    public void setRegistrationOpen(boolean registrationOpen) {
+    }
 }
