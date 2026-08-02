@@ -1,6 +1,7 @@
 package com.tk.eventmanager.service;
 
 import com.tk.eventmanager.dto.EventCreateRequest;
+import com.tk.eventmanager.dto.EventSearchRequest;
 import com.tk.eventmanager.exception.BadRequestException;
 import com.tk.eventmanager.exception.ResourceNotFoundException;
 import com.tk.eventmanager.model.Event;
@@ -8,8 +9,10 @@ import com.tk.eventmanager.model.EventStatus;
 import com.tk.eventmanager.model.Location;
 import com.tk.eventmanager.repository.EventRepository;
 import com.tk.eventmanager.repository.LocationRepository;
+import com.tk.eventmanager.specification.EventSpecifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -138,6 +141,20 @@ public class EventService {
         }
 
         eventRepository.delete(event);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Event> searchEvents(EventSearchRequest search, Pageable pageable) {
+        Specification<Event> spec = EventSpecifications.withFilters(
+                search.getStatus(),
+                search.getLocationId(),
+                search.getKeyword(),
+                search.getFrom(),
+                search.getTo(),
+                search.getMinCapacity()
+        );
+
+        return eventRepository.findAll(spec, pageable);
     }
 
     // === HELPER ===

@@ -1,5 +1,6 @@
 package com.tk.eventmanager.repository;
 
+import com.tk.eventmanager.dto.EventSummary;
 import com.tk.eventmanager.model.Event;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event, Long> {
+public interface EventRepository extends
+        JpaRepository<Event, Long>,
+        JpaSpecificationExecutor<Event> {
 
     // Spring Data сам сгенерирует SQL по имени метода!
     List<Event> findByStatus(String status);
@@ -35,6 +38,18 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     @EntityGraph(attributePaths = {"location"})
     Page<Event> findAllWithLocation(Pageable pageable);
+
+    @Query("""
+        SELECT e.id AS id, 
+               e.title AS title, 
+               e.status AS status, 
+               e.eventDate AS eventDate, 
+               e.capacity AS capacity,
+               l.name AS locationName
+        FROM Event e 
+        LEFT JOIN e.location l
+        """)
+    Page<EventSummary> findSummaries(Pageable pageable);
 
     // Пессимистичная блокировка: SELECT ... FOR UPDATE
     @Lock(LockModeType.PESSIMISTIC_WRITE)
