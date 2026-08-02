@@ -14,7 +14,7 @@ public class RegistrationMapper {
         dto.setEventTitle(reg.getEvent().getTitle());
         dto.setUserId(reg.getUser().getId());
         dto.setUserName(reg.getUser().getName());
-        dto.setStatus(reg.getStatus());
+        dto.setStatus(reg.getStatus().name());
         dto.setRegisteredAt(reg.getRegisteredAt());
         return dto;
     }

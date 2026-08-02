@@ -23,13 +23,9 @@ public class Registration {
     @Column(name = "registered_at")
     private LocalDateTime registeredAt;
 
-    private String status;  // CONFIRMED, CANCELED, WAITLIST
-
-    @PrePersist
-    protected void onCreate() {
-        this.registeredAt = LocalDateTime.now();
-        if (this.status == null) this.status = "CONFIRMED";
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RegistrationStatus status = RegistrationStatus.CONFIRMED;
 
     public Registration() {}
 
@@ -65,11 +61,11 @@ public class Registration {
         this.registeredAt = registeredAt;
     }
 
-    public String getStatus() {
+    public RegistrationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(RegistrationStatus status) {
         this.status = status;
     }
 }
