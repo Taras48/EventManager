@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RegistrationService {
+    private static final int MAX_RETRIES = 3;
 
     private final RegistrationRepository registrationRepository;
     private final EventRepository eventRepository;
@@ -32,31 +33,21 @@ public class RegistrationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
-        // === БИЗНЕС-ПРАВИЛА ===
-
-        // 1. Регистрация открыта только на PUBLISHED события
         if (!event.isRegistrationOpen()) {
-            throw new BadRequestException(
-                    "Registration is not open for event '" + event.getTitle() +
-                            "' (status: " + event.getStatus() + ", capacity: " + event.getCapacity() + ")");
+            throw new BadRequestException("Registration is not open");
         }
 
-        // 2. Нельзя зарегистрироваться дважды
         if (registrationRepository.existsByEventIdAndUserId(eventId, userId)) {
-            throw new DuplicateException(
-                    "User " + userId + " is already registered for event " + eventId);
+            throw new DuplicateException("Already registered");
         }
 
-        // 3. Уменьшаем количество мест
         event.setCapacity(event.getCapacity() - 1);
-        // dirty checking → UPDATE
+        // dirty checking → UPDATE ... WHERE version = ?
 
-        // 4. Создаём регистрацию
         Registration reg = new Registration();
         reg.setEvent(event);
         reg.setUser(user);
         reg.setStatus(RegistrationStatus.CONFIRMED);
-
         return registrationRepository.save(reg);
     }
 

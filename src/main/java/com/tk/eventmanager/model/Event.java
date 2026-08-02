@@ -45,6 +45,9 @@ public class Event {
     @Column(name = "canceled_at")
     private LocalDateTime canceledAt;
 
+    @Version
+    private Long version;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
