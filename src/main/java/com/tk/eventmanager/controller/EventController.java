@@ -2,6 +2,7 @@ package com.tk.eventmanager.controller;
 
 import com.tk.eventmanager.dto.EventCreateRequest;
 import com.tk.eventmanager.dto.EventResponse;
+import com.tk.eventmanager.dto.EventSearchRequest;
 import com.tk.eventmanager.mapper.EventMapper;
 import com.tk.eventmanager.model.Event;
 import com.tk.eventmanager.model.EventStatus;
@@ -98,5 +99,16 @@ public class EventController {
             @RequestParam EventStatus status, Pageable pageable) {
         return ResponseEntity.ok(
                 eventService.getEventsByStatus(status, pageable).map(eventMapper::toResponse));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<EventResponse>> searchEvents(
+            EventSearchRequest search,     // ← Spring сам биндит query-параметры
+            Pageable pageable) {
+
+        Page<EventResponse> events = eventService.searchEvents(search, pageable)
+                .map(eventMapper::toResponse);
+
+        return ResponseEntity.ok(events);
     }
 }
