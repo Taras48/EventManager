@@ -58,5 +58,6 @@ public class EventResponse {
     }
 
     public void setRegistrationOpen(boolean registrationOpen) {
+
     }
 }
