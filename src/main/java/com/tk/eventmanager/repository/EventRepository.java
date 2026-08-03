@@ -2,6 +2,7 @@ package com.tk.eventmanager.repository;
 
 import com.tk.eventmanager.dto.EventSummary;
 import com.tk.eventmanager.model.Event;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -49,4 +50,9 @@ public interface EventRepository extends
         LEFT JOIN e.location l
         """)
     Page<EventSummary> findSummaries(Pageable pageable);
+
+    // Пессимистичная блокировка: SELECT ... FOR UPDATE
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT e FROM Event e WHERE e.id = :id")
+    Optional<Event> findByIdForUpdate(@Param("id") Long id);
 }
